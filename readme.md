@@ -10,5 +10,7 @@ Make sure you use the `node` version mentioned in `.nvmrc`
 $ git clone git@github.com:coroiu/passwordless-demo-site.git
 $ cd passwordless-demo-site
 $ npm install
+# setup server/config.ts
+# setup client/config.ts
 $ npm start
 ```
