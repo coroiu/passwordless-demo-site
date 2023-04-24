@@ -33,6 +33,10 @@ export async function createApi(
       }
 
       const { token, userId } = await passwordless.register(email, name);
+      // TODO: using a login token is not really optimal because we have no
+      // way of verifying that the user actually performed the requried
+      // credential registration.
+      // Also obviously insecure because it's just base64 encoded user id
       const loginToken = Buffer.from(userId, "utf-8").toString("base64");
       repository.db.users.push({
         email,
