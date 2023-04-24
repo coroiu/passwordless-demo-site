@@ -1,9 +1,8 @@
+import { Link } from "react-router-dom";
 import { useUserProvider } from "../../providers/user/user-provider";
 
 export function Home() {
   const userProvider = useUserProvider();
-
-  console.log("current user", userProvider.currentUser);
 
   return (
     <div>
@@ -11,7 +10,11 @@ export function Home() {
       {userProvider.currentUser ? (
         <button>Logout</button>
       ) : (
-        <button>Login</button>
+        <div>
+          <Link to={"/register"}>Login</Link>
+          <br />
+          <Link to={"/register"}>Register</Link>
+        </div>
       )}
     </div>
   );

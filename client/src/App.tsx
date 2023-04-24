@@ -2,9 +2,10 @@ import React from "react";
 import "./App.css";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Home } from "./views/home/home";
-import { Login } from "./views/login/login";
+import { Home } from "./pages/home/home";
+import { Login } from "./pages/login/login";
 import { UserProvider } from "./providers/user/user-provider";
+import { Register } from "./pages/register/register";
 
 const router = createBrowserRouter([
   {
@@ -15,15 +16,19 @@ const router = createBrowserRouter([
     path: "/login",
     element: <Login></Login>,
   },
+  {
+    path: "/register",
+    element: <Register></Register>,
+  },
 ]);
 
 function App() {
   return (
-    <div className="App">
-      <UserProvider>
+    <UserProvider>
+      <div className="app">
         <RouterProvider router={router} />
-      </UserProvider>
-    </div>
+      </div>
+    </UserProvider>
   );
 }
 
