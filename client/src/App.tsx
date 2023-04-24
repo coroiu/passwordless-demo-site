@@ -6,6 +6,7 @@ import { Home } from "./pages/home/home";
 import { Login } from "./pages/login/login";
 import { UserProvider } from "./providers/user/user-provider";
 import { Register } from "./pages/register/register";
+import { QueryClient, QueryClientProvider } from "react-query";
 
 const router = createBrowserRouter([
   {
@@ -22,13 +23,17 @@ const router = createBrowserRouter([
   },
 ]);
 
+const queryClient = new QueryClient();
+
 function App() {
   return (
-    <UserProvider>
-      <div className="app">
-        <RouterProvider router={router} />
-      </div>
-    </UserProvider>
+    <QueryClientProvider client={queryClient}>
+      <UserProvider>
+        <div className="app">
+          <RouterProvider router={router} />
+        </div>
+      </UserProvider>
+    </QueryClientProvider>
   );
 }
 

@@ -82,4 +82,16 @@ export async function createApi(
       }
     },
   });
+
+  server.route({
+    method: "GET",
+    path: `${ApiPath}/user/credentials`,
+    handler: async (req, res) => {
+      // Supposed to simulate a bearer token containing a user id
+      const userId = req.headers["user-id"];
+      const credentials = await passwordless.getCredentials(userId);
+
+      return res.response(credentials).code(200);
+    },
+  });
 }

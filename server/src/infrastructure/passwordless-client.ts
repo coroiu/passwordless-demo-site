@@ -69,4 +69,29 @@ export class PasswordlessClient {
       return undefined;
     }
   }
+
+  async getCredentials(userId: string): Promise<unknown[]> {
+    const response = await fetch(
+      `${this.apiUrl}/credentials/list?userId=${userId}`,
+      {
+        method: "GET",
+        headers: {
+          ApiSecret: this.apiSecret,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (response.status > 299) {
+      console.error(
+        "Something happened when calling passwordless.getCredentials",
+        response.status,
+        await response.text()
+      );
+      throw new Error("Something happened when calling passwordless");
+    }
+
+    const body = await response.json();
+    return body;
+  }
 }
