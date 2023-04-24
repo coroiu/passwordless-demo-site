@@ -94,4 +94,20 @@ export async function createApi(
       return res.response(credentials).code(200);
     },
   });
+
+  server.route({
+    method: "POST",
+    path: `${ApiPath}/user/credentials`,
+    handler: async (req, res) => {
+      // Supposed to simulate a bearer token containing a user id
+      const userId = req.headers["user-id"];
+      const user = repository.db.users.find((user) => user.userId === userId);
+      if (user === undefined) {
+        return res.response("User not found").code(404);
+      }
+
+      const { token } = await passwordless.createCredential(user);
+      return res.response({ token }).code(200);
+    },
+  });
 }

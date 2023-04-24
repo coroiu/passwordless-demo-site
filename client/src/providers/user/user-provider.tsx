@@ -98,6 +98,24 @@ export function UserProvider({ children }: PropsWithChildren<{}>) {
         return false;
       }
     },
+
+    async createCredential(nickname: string) {
+      if (currentUser === undefined) return false;
+
+      const result = await fetch("/api/user/credentials", {
+        method: "POST",
+        headers: {
+          "user-id": currentUser.userId,
+          "Content-Type": "application/json",
+        },
+      });
+      const json = (await result.json()) as {
+        token: string;
+      };
+
+      await passwordless.current.register(json.token, nickname);
+      return true;
+    },
   };
   return <Context.Provider value={value}>{children}</Context.Provider>;
 }
