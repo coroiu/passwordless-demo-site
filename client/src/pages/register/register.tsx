@@ -1,34 +1,39 @@
 import { useState } from "react";
+import Button from "@mui/lab/LoadingButton";
 import { useUserProvider } from "../../providers/user/user-provider";
+import TextField from "@mui/material/TextField";
 
 export function Register() {
   const userProvider = useUserProvider();
   const [loading, setLoading] = useState(false);
 
-  function submit() {
+  async function submit() {
     if (loading) return;
     setLoading(true);
 
-    userProvider.login();
+    // await userProvider.register()
   }
 
   return (
-    <form>
-      <div>
-        <label>Email</label>
-        <input type="text" name="email" />
-      </div>
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        submit();
+        return false;
+      }}
+    >
+      <TextField label="Email" fullWidth margin="normal"></TextField>
+      <TextField
+        label="Name"
+        fullWidth
+        margin="normal"
+        sx={{ mb: 3 }}
+      ></TextField>
 
-      <div>
-        <label>Name</label>
-        <input type="text" name="name" />
-      </div>
-
-      <div>
-        <button type="submit" disabled={loading} onClick={submit}>
-          Register
-        </button>
-      </div>
+      <Button type="submit" variant="contained" loading={loading}>
+        Register
+      </Button>
     </form>
   );
 }
