@@ -6,12 +6,14 @@ import TextField from "@mui/material/TextField";
 export function Register() {
   const userProvider = useUserProvider();
   const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
 
   async function submit() {
     if (loading) return;
     setLoading(true);
 
-    // await userProvider.register()
+    await userProvider.register(email, name);
   }
 
   return (
@@ -23,11 +25,19 @@ export function Register() {
         return false;
       }}
     >
-      <TextField label="Email" fullWidth margin="normal"></TextField>
+      <TextField
+        label="Email"
+        fullWidth
+        margin="normal"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      ></TextField>
       <TextField
         label="Name"
         fullWidth
         margin="normal"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
         sx={{ mb: 3 }}
       ></TextField>
 

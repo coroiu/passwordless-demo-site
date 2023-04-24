@@ -26,6 +26,9 @@ export function UserProvider({ children }: PropsWithChildren<{}>) {
         const result = await fetch("/api/user/register", {
           method: "POST",
           body: JSON.stringify({ email, name }),
+          headers: {
+            "Content-Type": "application/json",
+          },
         });
         const json = (await result.json()) as {
           token: string;
