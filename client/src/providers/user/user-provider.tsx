@@ -1,19 +1,34 @@
-import React, { PropsWithChildren, useContext } from "react";
+import React, { PropsWithChildren, useContext, useRef, useState } from "react";
 import { UserProviderContext } from "./user-provider.context";
 import { Client } from "@passwordlessdev/passwordless-client";
 import { Config } from "../../config";
-
-var passwordless = new Client({
-  apiKey: Config.passwordlessDev.apiPublic,
-});
+import { User } from "./user";
 
 const Context = React.createContext<UserProviderContext | null>(null);
 
 export function UserProvider({ children }: PropsWithChildren<{}>) {
-  const value: UserProviderContext = {
-    currentUser: undefined,
+  const passwordless = useRef(
+    new Client({
+      apiKey: Config.passwordlessDev.apiPublic,
+      apiUrl: Config.passwordlessDev.apiUrl,
+    })
+  );
+  const [currentUser, setCurrentUser] = useState<User | undefined>(undefined);
 
-    async login() {
+  const value: UserProviderContext = {
+    get currentUser() {
+      return currentUser;
+    },
+
+    async login(email: string) {
+      const token = passwordless.current.signinWithAlias(email);
+      const result = await fetch("/api/user/login", {
+        method: "POST",
+        body: JSON.stringify({ token }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       return false;
     },
 
@@ -35,7 +50,9 @@ export function UserProvider({ children }: PropsWithChildren<{}>) {
           loginToken: string;
         };
 
-        await passwordless.register(json.token, "Primary");
+        await passwordless.current.register(json.token, "Primary");
+
+        // await this.loginWithToken(json.loginToken);
         return true;
       } catch (error) {
         console.error("Failed to register", error);

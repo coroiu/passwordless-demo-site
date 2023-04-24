@@ -3,6 +3,7 @@ import { plugin as proxyPlugin } from "@hapi/h2o2";
 import { createApi } from "./api";
 import { PasswordlessClient } from "./infrastructure/passwordless-client";
 import { Config } from "./config";
+import { DatabaseRepository } from "./infrastructure/db";
 
 async function run() {
   const server = HapiServer({
@@ -15,7 +16,9 @@ async function run() {
     Config.passwordlessDev.apiSecret
   );
 
-  await createApi(server, passwordlessClient);
+  const db = await DatabaseRepository.init();
+
+  await createApi(server, passwordlessClient, db);
   await server.register(proxyPlugin);
 
   server.route({
