@@ -1,4 +1,10 @@
-import React, { PropsWithChildren, useContext, useRef, useState } from "react";
+import React, {
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { UserProviderContext } from "./user-provider.context";
 import { Client } from "@passwordlessdev/passwordless-client";
 import { Config } from "../../config";
@@ -15,13 +21,22 @@ export function UserProvider({ children }: PropsWithChildren<{}>) {
   );
   const [currentUser, setCurrentUser] = useState<User | undefined>(undefined);
 
+  useEffect(() => {
+    const storedData = localStorage.getItem("currentUser");
+    if (storedData === null) {
+      return;
+    }
+
+    setCurrentUser(JSON.parse(storedData));
+  }, []);
+
   const value: UserProviderContext = {
     get currentUser() {
       return currentUser;
     },
 
     async login(email: string) {
-      const token = passwordless.current.signinWithAlias(email);
+      const token = await passwordless.current.signinWithAlias(email);
       const result = await fetch("/api/user/login", {
         method: "POST",
         body: JSON.stringify({ token }),
@@ -29,30 +44,54 @@ export function UserProvider({ children }: PropsWithChildren<{}>) {
           "Content-Type": "application/json",
         },
       });
-      return false;
+
+      if (result.status > 299) {
+        console.error("Login failed", await result.text());
+        return false;
+      }
+
+      const user = await result.json();
+      localStorage.setItem("currentUser", JSON.stringify(user));
+      setCurrentUser(user);
+      return true;
     },
 
     async logout() {
-      return false;
+      localStorage.removeItem("currentUser");
+      setCurrentUser(undefined);
     },
 
     async register(email: string, name: string) {
       try {
-        const result = await fetch("/api/user/register", {
+        const registerResult = await fetch("/api/user/register", {
           method: "POST",
           body: JSON.stringify({ email, name }),
           headers: {
             "Content-Type": "application/json",
           },
         });
-        const json = (await result.json()) as {
+        const registerJson = (await registerResult.json()) as {
           token: string;
           loginToken: string;
         };
 
-        await passwordless.current.register(json.token, "Primary");
+        await passwordless.current.register(registerJson.token, "Primary");
 
-        // await this.loginWithToken(json.loginToken);
+        const loginResult = await fetch("/api/user/login", {
+          method: "POST",
+          body: JSON.stringify({ loginToken: registerJson.loginToken }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (loginResult.status > 299) {
+          console.error("Login failed", await loginResult.text());
+          return false;
+        }
+        const user = await loginResult.json();
+        localStorage.setItem("currentUser", JSON.stringify(user));
+        setCurrentUser(user);
         return true;
       } catch (error) {
         console.error("Failed to register", error);

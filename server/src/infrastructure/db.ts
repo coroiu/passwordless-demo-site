@@ -17,7 +17,7 @@ export class DatabaseRepository {
   static async init(): Promise<DatabaseRepository> {
     let db;
     if (!existsSync(filepath)) {
-      await writeFile(filepath, "{}");
+      await writeFile(filepath, JSON.stringify({ users: [] }));
     }
 
     db = JSON.parse(await readFile(filepath, { encoding: "utf-8" }));

@@ -1,13 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "@mui/lab/LoadingButton";
 import { useUserProvider } from "../../providers/user/user-provider";
 import TextField from "@mui/material/TextField";
+import { useNavigate } from "react-router-dom";
 
 export function Register() {
   const userProvider = useUserProvider();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
+
+  useEffect(() => {
+    if (userProvider.currentUser !== undefined) {
+      navigate("/");
+    }
+  }, [userProvider, navigate]);
 
   async function submit() {
     if (loading) return;
@@ -18,6 +26,8 @@ export function Register() {
     if (!result) {
       return setLoading(false);
     }
+
+    navigate("/");
   }
 
   return (

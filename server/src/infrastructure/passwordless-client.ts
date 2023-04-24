@@ -39,4 +39,34 @@ export class PasswordlessClient {
 
     return { token, userId };
   }
+
+  async login(token: string): Promise<string | undefined> {
+    const response = await fetch(`${this.apiUrl}/signin/verify`, {
+      method: "POST",
+      body: JSON.stringify({ token }),
+      headers: {
+        ApiSecret: this.apiSecret,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.status > 299) {
+      console.error(
+        "Something happened when calling passwordless.login",
+        token,
+        response.status,
+        await response.text()
+      );
+      throw new Error("Something happened when calling passwordless");
+    }
+
+    const body = await response.json();
+
+    if (body.success) {
+      return body.userId;
+    } else {
+      console.warn("Sign in failed.", body);
+      return undefined;
+    }
+  }
 }

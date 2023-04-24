@@ -57,11 +57,25 @@ export async function createApi(
 
       if (loginToken !== undefined) {
         const userId = Buffer.from(loginToken, "base64").toString("utf-8");
+        const user = repository.db.users.find((user) => user.userId === userId);
+        if (user === undefined) {
+          return res.response("User not found").code(404);
+        }
+
+        return res.response(user);
+      } else {
+        const userId = await passwordless.login(token);
+        if (userId === undefined) {
+          return res.response("Invalid login").code(401);
+        }
+
+        const user = repository.db.users.find((user) => user.userId === userId);
+        if (user === undefined) {
+          return res.response("User not found").code(404);
+        }
+
+        return res.response(user);
       }
-
-      // const { token, userId } = await passwordless.register(email, name);
-
-      return res.response({ token, loginToken });
     },
   });
 }
