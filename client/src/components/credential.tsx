@@ -27,7 +27,13 @@ export interface CredentialModel {
   nickname: string;
 }
 
-export function Credential({ credential }: { credential: CredentialModel }) {
+export function Credential({
+  credential,
+  onDelete = () => {},
+}: {
+  credential: CredentialModel;
+  onDelete?: (credentialId: string) => void;
+}) {
   return (
     <Card sx={{ display: "flex", backgroundColor: "whitesmoke" }}>
       <CardMedia>
@@ -58,7 +64,10 @@ export function Credential({ credential }: { credential: CredentialModel }) {
           </Typography>
         </CardContent>
         <Box sx={{ display: "flex", alignItems: "center", pl: 1, pb: 1 }}>
-          <IconButton color="error">
+          <IconButton
+            color="error"
+            onClick={() => onDelete(credential.descriptor.id)}
+          >
             <DeleteIcon />
           </IconButton>
         </Box>
