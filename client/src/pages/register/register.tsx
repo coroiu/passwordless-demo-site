@@ -13,7 +13,11 @@ export function Register() {
     if (loading) return;
     setLoading(true);
 
-    await userProvider.register(email, name);
+    const result = await userProvider.register(email, name);
+
+    if (!result) {
+      return setLoading(false);
+    }
   }
 
   return (
